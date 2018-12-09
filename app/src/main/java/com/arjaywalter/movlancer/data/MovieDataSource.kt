@@ -55,7 +55,7 @@ class MovieDataSource(private val appController: MovieService) : PageKeyedDataSo
 
                     override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                         val errorMessage = if (t == null) "unknown error" else t.message
-                        networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage))
+                        networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage!!))
                     }
                 })
     }
@@ -99,7 +99,7 @@ class MovieDataSource(private val appController: MovieService) : PageKeyedDataSo
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 val errorMessage = if (t == null) "unknown error" else t.message
-                networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage))
+                networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage!!))
             }
         })
     }
