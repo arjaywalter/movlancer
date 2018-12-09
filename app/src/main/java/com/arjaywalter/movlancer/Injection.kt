@@ -36,14 +36,15 @@ object Injection {
     /**
      * Creates an instance of [MovieDataSource] based on the [MovieService]
      */
-    private fun provideFeedDataSource(): MovieDataSource {
-        return MovieDataSource(MovieService.create())
+    private fun provideFeedDataSource(context: Context): MovieDataSource {
+        val database = MovieDatabase.getInstance(context)
+        return MovieDataSource(MovieService.create(), database.moviesDao(), Executors.newSingleThreadExecutor())
     }
     /**
      * Creates an instance of [MovieDataSource] based on the [MovieService]
      */
-    private fun provideFeedDataFactory(): MovieDataFactory {
-        return MovieDataFactory(provideFeedDataSource())
+    private fun provideFeedDataFactory(context: Context): MovieDataFactory {
+        return MovieDataFactory(provideFeedDataSource(context))
     }
     /**
      * Creates an instance of [MovieLocalCache] based on the database DAO.
@@ -66,7 +67,7 @@ object Injection {
      * [ViewModel] objects.
      */
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
-        return ViewModelFactory(provideMovieRepository(context), provideFeedDataFactory())
+        return ViewModelFactory(provideMovieRepository(context), provideFeedDataFactory(context))
     }
 
 }

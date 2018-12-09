@@ -3,19 +3,21 @@ package com.arjaywalter.movlancer.data
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.PageKeyedDataSource
 import android.util.Log
-
-import com.arjaywalter.movlancer.model.MovieResponse
 import com.arjaywalter.movlancer.api.MovieService
 import com.arjaywalter.movlancer.api.MovieService.Companion.API_KEY
+import com.arjaywalter.movlancer.db.MovieDao
 import com.arjaywalter.movlancer.model.Movie
+import com.arjaywalter.movlancer.model.MovieResponse
 import com.arjaywalter.movlancer.utils.NetworkState
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.Executor
 
 
-class MovieDataSource(private val movieService: MovieService) : PageKeyedDataSource<Long, Movie>() {
+class MovieDataSource(private val movieService: MovieService,
+                      private val db: MovieDao,
+                      private val ioExecutor: Executor) : PageKeyedDataSource<Long, Movie>() {
 
     /*
      * Step 1: Initialize the restApiFactory.
@@ -43,17 +45,34 @@ class MovieDataSource(private val movieService: MovieService) : PageKeyedDataSou
                 .enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                         if (response.isSuccessful) {
-                            callback.onResult(response.body()!!.results, null, 2L)
+
+                            response.body()?.results?.let {
+                                callback.onResult(it, null, 2L)
+                                ioExecutor.execute {
+                                    db.deleteAll()
+                                    Log.d("MovieDataSource", "inserting ${it.size} movies")
+                                    db.insert(it)
+                                }
+                            }
                             initialLoading.postValue(NetworkState.LOADED)
                             networkState.postValue(NetworkState.LOADED)
+
 
                         } else {
                             initialLoading.postValue(NetworkState(NetworkState.Status.FAILED, response.message()))
                             networkState.postValue(NetworkState(NetworkState.Status.FAILED, response.message()))
+                            callback.onResult(db.getMoviesMutable(), null, null)
                         }
                     }
 
                     override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                        Log.d("MovieDataSource", "loadInitial onFailure")
+                        var movies: List<Movie>? = null
+                        ioExecutor.execute {
+                            movies = db.getMoviesMutable()
+                            callback.onResult(movies as MutableList<Movie>, null, null)
+                        }
+
                         val errorMessage = if (t == null) "unknown error" else t.message
                         networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage!!))
                     }
@@ -90,7 +109,13 @@ class MovieDataSource(private val movieService: MovieService) : PageKeyedDataSou
                  */
                 if (response.isSuccessful) {
                     val nextKey = if (params.key == response.body()?.totalResults?.toLong()) null else params.key + 1
-                    callback.onResult(response.body()!!.results, nextKey)
+                    response.body()?.results?.let {
+                        callback.onResult(it, nextKey)
+                        ioExecutor.execute {
+                            Log.d("MovieDataSource", "inserting ${it.size} movies")
+                            db.insert(it)
+                        }
+                    }
                     networkState.postValue(NetworkState.LOADED)
 
                 } else
@@ -98,6 +123,7 @@ class MovieDataSource(private val movieService: MovieService) : PageKeyedDataSou
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                Log.d("MovieDataSource", "loadAfter onFailure")
                 val errorMessage = if (t == null) "unknown error" else t.message
                 networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage!!))
             }

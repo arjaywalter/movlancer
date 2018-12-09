@@ -39,4 +39,10 @@ interface MovieDao {
             ":queryString) ORDER BY stars DESC, name ASC")*/
     @Query("SELECT * FROM movies WHERE title LIKE :queryString")
     fun moviesByTitle(queryString: String): LiveData<List<Movie>>
+
+    @Query("DELETE FROM movies")
+    fun deleteAll()
+
+    @Query("SELECT * FROM movies ORDER BY popularity DESC")
+    fun getMoviesMutable(): MutableList<Movie>
 }
