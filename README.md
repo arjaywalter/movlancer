@@ -11,7 +11,7 @@
 * [Glide][glide] for image loading
 
 ### References
-*https://developer.android.com/topic/libraries/architecture/
+*https://developer.android.com/topic/libraries/architecture
 *https://github.com/anitaa1990/PagingLibrary-Sample
 *https://github.com/googlesamples/android-architecture-components
 
