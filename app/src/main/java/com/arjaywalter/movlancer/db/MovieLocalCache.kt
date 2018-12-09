@@ -42,15 +42,15 @@ class MovieLocalCache(
     }
 
     /**
-     * Request a LiveData<List<Repo>> from the Dao, based on a repo name. If the name contains
-     * multiple words separated by spaces, then we're emulating the GitHub API behavior and allow
+     * Request a LiveData<List<Movie>> from the Dao, based on a name. If the name contains
+     * multiple words separated by spaces, then we're emulating the API behavior and allow
      * any characters between the words.
      * @param name repository name
      */
     fun reposByName(name: String): LiveData<List<Movie>> {
         // appending '%' so we can allow other characters to be before and after the query string
         val query = "%${name.replace(' ', '%')}%"
-        return movieDao.reposByName(query)
+        return movieDao.moviesByTitle(query)
     }
 
     fun movies(): LiveData<List<Movie>> {

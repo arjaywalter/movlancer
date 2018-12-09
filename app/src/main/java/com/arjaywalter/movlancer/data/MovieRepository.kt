@@ -20,17 +20,15 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.arjaywalter.movlancer.db.MovieLocalCache
 import com.arjaywalter.movlancer.model.MovieSearchResult
-import com.example.android.codelabs.paging.api.MovieService
-import com.example.android.codelabs.paging.api.getMovies
-import com.example.android.codelabs.paging.api.searchRepos
+import com.arjaywalter.movlancer.api.MovieService
+import com.arjaywalter.movlancer.api.getMovies
+import com.arjaywalter.movlancer.api.searchMovies
 
 /**
  * Repository class that works with local and remote data sources.
  */
-class MoviesRepository(
-        private val service: MovieService,
-        private val cache: MovieLocalCache
-) {
+class MovieRepository(private val service: MovieService,
+                      private val cache: MovieLocalCache) {
 
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = 1
@@ -45,7 +43,7 @@ class MoviesRepository(
      * Search repositories whose names match the query.
      */
     fun search(query: String): MovieSearchResult {
-        Log.d("MoviesRepository", "New query: $query")
+        Log.d("MovieRepository", "New query: $query")
         lastRequestedPage = 1
         requestAndSaveData(query)
 
@@ -64,11 +62,11 @@ class MoviesRepository(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { repos ->
-            cache.insert(repos, {
+        searchMovies(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { repos ->
+            cache.insert(repos) {
                 lastRequestedPage++
                 isRequestInProgress = false
-            })
+            }
         }, { error ->
             networkErrors.postValue(error)
             isRequestInProgress = false

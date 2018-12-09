@@ -18,11 +18,13 @@ package com.arjaywalter.movlancer
 
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
+import com.arjaywalter.movlancer.data.MovieDataFactory
+import com.arjaywalter.movlancer.data.MovieDataSource
 import com.arjaywalter.movlancer.db.MovieLocalCache
 import com.arjaywalter.movlancer.db.MovieDatabase
 import com.arjaywalter.movlancer.ui.ViewModelFactory
-import com.example.android.codelabs.paging.api.MovieService
-import com.example.android.codelabs.paging.data.MoviesRepository
+import com.arjaywalter.movlancer.api.MovieService
+import com.example.android.codelabs.paging.data.MovieRepository
 import java.util.concurrent.Executors
 
 /**
@@ -31,7 +33,18 @@ import java.util.concurrent.Executors
  * testing, where needed.
  */
 object Injection {
-
+    /**
+     * Creates an instance of [MovieDataSource] based on the [MovieService]
+     */
+    private fun provideFeedDataSource(): MovieDataSource {
+        return MovieDataSource(MovieService.create())
+    }
+    /**
+     * Creates an instance of [MovieDataSource] based on the [MovieService]
+     */
+    private fun provideFeedDataFactory(): MovieDataFactory {
+        return MovieDataFactory(provideFeedDataSource())
+    }
     /**
      * Creates an instance of [MovieLocalCache] based on the database DAO.
      */
@@ -41,11 +54,11 @@ object Injection {
     }
 
     /**
-     * Creates an instance of [MoviesRepository] based on the [MovieService] and a
+     * Creates an instance of [MovieRepository] based on the [MovieService] and a
      * [MovieLocalCache]
      */
-    private fun provideGithubRepository(context: Context): MoviesRepository {
-        return MoviesRepository(MovieService.create(), provideCache(context))
+    private fun provideMovieRepository(context: Context): MovieRepository {
+        return MovieRepository(MovieService.create(), provideCache(context))
     }
 
     /**
@@ -53,7 +66,7 @@ object Injection {
      * [ViewModel] objects.
      */
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
-        return ViewModelFactory(provideGithubRepository(context))
+        return ViewModelFactory(provideMovieRepository(context), provideFeedDataFactory())
     }
 
 }

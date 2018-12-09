@@ -38,5 +38,5 @@ interface MovieDao {
     /*@Query("SELECT * FROM repos WHERE (name LIKE :queryString) OR (description LIKE " +
             ":queryString) ORDER BY stars DESC, name ASC")*/
     @Query("SELECT * FROM movies WHERE title LIKE :queryString")
-    fun reposByName(queryString: String): LiveData<List<Movie>>
+    fun moviesByTitle(queryString: String): LiveData<List<Movie>>
 }

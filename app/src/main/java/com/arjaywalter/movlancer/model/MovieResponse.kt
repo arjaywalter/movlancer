@@ -1,4 +1,4 @@
-package com.arjaywalter.movlancer.api
+package com.arjaywalter.movlancer.model
 
 import com.arjaywalter.movlancer.model.Movie
 import com.google.gson.annotations.Expose

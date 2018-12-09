@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.example.android.codelabs.paging.api
+package com.arjaywalter.movlancer.api
 
 import android.util.Log
-import com.arjaywalter.movlancer.api.MovieResponse
 import com.arjaywalter.movlancer.model.Movie
+import com.arjaywalter.movlancer.model.MovieResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -32,51 +32,6 @@ import retrofit2.http.Query
 
 private const val TAG = "MovieService"
 private const val IN_QUALIFIER = "in:name,description"
-
-/**
- * Search repos based on a query.
- * Trigger a request to the Github searchRepo API with the following params:
- * @param query searchRepo keyword
- * @param page request page index
- * @param itemsPerPage number of repositories to be returned by the Github API per page
- *
- * The result of the request is handled by the implementation of the functions passed as params
- * @param onSuccess function that defines how to handle the list of repos received
- * @param onError function that defines how to handle request failure
- */
-fun searchRepos(
-        service: MovieService,
-        query: String,
-        page: Int,
-        itemsPerPage: Int,
-        onSuccess: (repos: List<Movie>) -> Unit,
-        onError: (error: String) -> Unit) {
-    Log.d(TAG, "query: $query, page: $page, itemsPerPage: $itemsPerPage")
-
-    val apiQuery = query + IN_QUALIFIER
-
-    service.searchRepos(apiQuery, page, itemsPerPage).enqueue(
-            object : Callback<RepoSearchResponse> {
-                override fun onFailure(call: Call<RepoSearchResponse>?, t: Throwable) {
-                    Log.d(TAG, "fail to get data")
-                    onError(t.message ?: "unknown error")
-                }
-
-                override fun onResponse(
-                        call: Call<RepoSearchResponse>?,
-                        response: Response<RepoSearchResponse>
-                ) {
-                    Log.d(TAG, "got a response $response")
-                    if (response.isSuccessful) {
-                        val repos = response.body()?.items ?: emptyList()
-                        onSuccess(repos)
-                    } else {
-                        onError(response.errorBody()?.string() ?: "Unknown error")
-                    }
-                }
-            }
-    )
-}
 
 
 fun getMovies(
@@ -114,27 +69,77 @@ fun getMovies(
 
 
 /**
+ * Search based on a query.
+ * @param query search keyword
+ * @param page request page index
+ * @param itemsPerPage number of items to be returned by the API per page
+ *
+ * The result of the request is handled by the implementation of the functions passed as params
+ * @param onSuccess function that defines how to handle the list of repos received
+ * @param onError function that defines how to handle request failure
+ */
+fun searchMovies(
+        service: MovieService,
+        query: String,
+        page: Int,
+        itemsPerPage: Int,
+        onSuccess: (repos: List<Movie>) -> Unit,
+        onError: (error: String) -> Unit) {
+    Log.d(TAG, "query: $query, page: $page, itemsPerPage: $itemsPerPage")
+
+    val apiQuery = query + IN_QUALIFIER
+
+    service.searchRepos(apiQuery, page, itemsPerPage).enqueue(
+            object : Callback<MovieResponse> {
+                override fun onFailure(call: Call<MovieResponse>?, t: Throwable) {
+                    Log.d(TAG, "fail to get data")
+                    onError(t.message ?: "unknown error")
+                }
+
+                override fun onResponse(
+                        call: Call<MovieResponse>?,
+                        response: Response<MovieResponse>
+                ) {
+                    Log.d(TAG, "got a response $response")
+                    if (response.isSuccessful) {
+                        val repos = response.body()?.results ?: emptyList()
+                        onSuccess(repos)
+                    } else {
+                        onError(response.errorBody()?.string() ?: "Unknown error")
+                    }
+                }
+            }
+    )
+}
+
+
+/**
  * Github API communication setup via Retrofit.
  */
 interface MovieService {
-    /**
-     * Get repos ordered by stars.
-     */
-    @GET("search/repositories?sort=stars")
-    fun searchRepos(@Query("q") query: String,
-                    @Query("page") page: Int,
-                    @Query("per_page") itemsPerPage: Int): Call<RepoSearchResponse>
 
+    /**
+     * Get popular movies.
+     */
     @GET("movie/popular")
     fun getMovies(
             @Query("page") page: Int,
             @Query("api_key") apiKey: String? = API_KEY): Call<MovieResponse>
 
 
+    /**
+     * Search movies.
+     */
+    @GET("search/repositories?sort=stars")
+    fun searchRepos(@Query("q") query: String,
+                    @Query("page") page: Int,
+                    @Query("per_page") itemsPerPage: Int): Call<MovieResponse>
+
+
     companion object {
-        //        private const val BASE_URL = "https://api.github.com/"
         private const val BASE_URL = "https://api.themoviedb.org/3/"
-        private const val API_KEY = "e92fb0a1dede792e7f761056e036978c"
+        const val API_KEY = "e92fb0a1dede792e7f761056e036978c"
+        var POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
         fun create(): MovieService {
             val logger = HttpLoggingInterceptor()

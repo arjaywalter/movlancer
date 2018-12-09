@@ -18,17 +18,18 @@ package com.arjaywalter.movlancer.ui
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.example.android.codelabs.paging.data.MoviesRepository
+import com.arjaywalter.movlancer.data.MovieDataFactory
+import com.example.android.codelabs.paging.data.MovieRepository
 
 /**
  * Factory for ViewModels
  */
-class ViewModelFactory(private val repository: MoviesRepository) : ViewModelProvider.Factory {
+class ViewModelFactory(private val repository: MovieRepository, private val feedDataSource: MovieDataFactory) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(MovieViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(repository) as T
+            return MovieViewModel(repository, feedDataSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
