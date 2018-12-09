@@ -11,11 +11,11 @@
 * [Glide][glide] for image loading
 
 ### References
-https://developer.android.com/topic/libraries/architecture/
-https://github.com/anitaa1990/PagingLibrary-Sample
-https://github.com/googlesamples/android-architecture-components
+*https://developer.android.com/topic/libraries/architecture/
+*https://github.com/anitaa1990/PagingLibrary-Sample
+*https://github.com/googlesamples/android-architecture-components
 
 Developed By
 ------------
 
-Arjay Walter Bernardion - <arjaywalterbernardino@gmail.com>
+Arjay Walter Bernardino - <arjaywalterbernardino@gmail.com>
