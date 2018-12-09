@@ -32,4 +32,6 @@ ext {
     paging_version = "1.0.1"
     retrofitVersion = "2.3.0"
     okhttpLoggingInterceptorVersion = "3.9.0"
+    rxJavaVersion = "2.1.9"
+    rxAndroidVersion = "2.1.0"
 }
