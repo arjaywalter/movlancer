@@ -15,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class MovieDataSource(private val appController: MovieService) : PageKeyedDataSource<Long, Movie>() {
+class MovieDataSource(private val movieService: MovieService) : PageKeyedDataSource<Long, Movie>() {
 
     /*
      * Step 1: Initialize the restApiFactory.
@@ -39,7 +39,7 @@ class MovieDataSource(private val appController: MovieService) : PageKeyedDataSo
         initialLoading.postValue(NetworkState.LOADING)
         networkState.postValue(NetworkState.LOADING)
 
-        appController.getMovies(1, API_KEY)
+        movieService.getMovies(1, API_KEY)
                 .enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                         if (response.isSuccessful) {
@@ -81,7 +81,7 @@ class MovieDataSource(private val appController: MovieService) : PageKeyedDataSo
 
         networkState.postValue(NetworkState.LOADING)
 
-        appController.getMovies(params.key.toInt(), API_KEY).enqueue(object : Callback<MovieResponse> {
+        movieService.getMovies(params.key.toInt(), API_KEY).enqueue(object : Callback<MovieResponse> {
             override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 /*
                  * If the request is successful, then we will update the callback

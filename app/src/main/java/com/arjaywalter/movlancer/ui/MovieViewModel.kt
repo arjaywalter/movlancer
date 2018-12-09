@@ -20,9 +20,8 @@ class MovieViewModel(private val repository: MovieRepository, feedDataFactory: M
     var moviesPagedList: LiveData<PagedList<Movie>>? = null
 
     init {
-
-        networkState = Transformations.switchMap(feedDataFactory.mutableLiveData
-        ) { dataSource -> dataSource.networkState }
+        networkState = Transformations.switchMap(feedDataFactory.mutableLiveData)
+        { dataSource -> dataSource.networkState }
 
         val pagedListConfig = PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
@@ -32,32 +31,8 @@ class MovieViewModel(private val repository: MovieRepository, feedDataFactory: M
         moviesPagedList = LivePagedListBuilder(feedDataFactory, pagedListConfig)
                 .setFetchExecutor(executor)
                 .build()
+
+        moviesPagedList?.value
     }
-
-//    private val queryLiveData = MutableLiveData<String>()
-//    private val repoResult: LiveData<MovieSearchResult> = Transformations.map(queryLiveData, {
-//        repository.search(it)
-//    })
-////    val repos: LiveData<List<Movie>> = Transformations.switchMap(repoResult,
-////            { it -> it.data })
-//
-//    val networkErrors: LiveData<String> = Transformations.switchMap(repoResult,
-//            { it -> it.networkErrors })
-//
-//    private lateinit var movies: LiveData<PagedList<Movie>>
-//
-//    fun getMovies(): LiveData<PagedList<Movie>> {
-//        if (!::movies.isInitialized) {
-//            movies = MutableLiveData()
-//            loadMovies()
-//        }
-//        return movies
-//    }
-//
-//    fun loadMovies() {
-//        // Do an asynchronous operation to fetch movies.
-//        movies = repository.fetchMovies().data
-//    }
-
 
 }
