@@ -33,10 +33,12 @@ class MovieListAdapter(private val clickListener: (Movie) -> Unit) : PagedListAd
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return ViewHolder(inflater.inflate(R.layout.item_movie, parent, false))
+        //TODO Add network state view holder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         getItem(position)?.let { holder.bind(it, clickListener, requestOptions) }
+        //TODO Add Bind network state view holder
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

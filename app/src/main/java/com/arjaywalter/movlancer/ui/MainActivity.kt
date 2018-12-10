@@ -14,19 +14,15 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val movieClickListener = object : (Movie) -> Unit {
-        override fun invoke(it: Movie) {
-
-        }
-    }
-
     private lateinit var viewModel: MovieViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val adapter = MovieListAdapter(movieClickListener)
+        val adapter = MovieListAdapter {
+            //TODO On movie item click
+        }
         recyclerView.adapter = adapter
 
 
@@ -43,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.networkState?.observe(this, Observer<NetworkState> { networkState ->
             networkState?.let { adapter.setNetworkState(it) }
         })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

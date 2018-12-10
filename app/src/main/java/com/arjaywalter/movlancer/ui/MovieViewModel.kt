@@ -14,6 +14,7 @@ import java.util.concurrent.Executors
 
 
 class MovieViewModel(private val repository: MovieRepository, feedDataFactory: MovieDataFactory) : ViewModel() {
+    //TODO use repository for DB + Network Paging
 
     private val executor: Executor = Executors.newFixedThreadPool(5)
     var networkState: LiveData<NetworkState>? = null

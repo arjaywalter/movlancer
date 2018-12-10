@@ -27,13 +27,12 @@ import java.util.concurrent.Executor
  */
 class MovieLocalCache(
         private val movieDao: MovieDao,
-        private val ioExecutor: Executor
-) {
+        private val ioExecutor: Executor) {
 
     /**
      * Insert a list of repos in the database, on a background thread.
      */
-    fun insert(repos: List<Movie>, insertFinished: ()-> Unit) {
+    fun insert(repos: List<Movie>, insertFinished: () -> Unit) {
         ioExecutor.execute {
             Log.d("MovieLocalCache", "inserting ${repos.size} repos")
             movieDao.insert(repos)
@@ -55,4 +54,5 @@ class MovieLocalCache(
 
     fun movies(): LiveData<List<Movie>> {
         return movieDao.getMovies()
-    }}
+    }
+}

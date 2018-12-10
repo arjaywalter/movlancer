@@ -65,9 +65,9 @@ class MovieDataSource(private val movieService: MovieService,
                         }
                     }
 
-                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<MovieResponse>, t: Throwable?) {
                         Log.d("MovieDataSource", "loadInitial onFailure")
-                        var movies: List<Movie>? = null
+                        var movies: List<Movie>?
                         ioExecutor.execute {
                             movies = db.getMoviesMutable()
                             callback.onResult(movies as MutableList<Movie>, null, null)
@@ -122,7 +122,7 @@ class MovieDataSource(private val movieService: MovieService,
                     networkState.postValue(NetworkState(NetworkState.Status.FAILED, response.message()))
             }
 
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable?) {
                 Log.d("MovieDataSource", "loadAfter onFailure")
                 val errorMessage = if (t == null) "unknown error" else t.message
                 networkState.postValue(NetworkState(NetworkState.Status.FAILED, errorMessage!!))
